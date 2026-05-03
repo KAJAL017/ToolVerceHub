@@ -177,6 +177,16 @@
                         <p class="text-gray-600">Enter your credentials to access the dashboard</p>
                     </div>
                     
+                    <!-- Success Messages -->
+                    @if (session('success'))
+                        <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <p class="text-green-700 text-sm font-medium">{{ session('success') }}</p>
+                            </div>
+                        </div>
+                    @endif
+                    
                     <!-- Error Messages -->
                     @if ($errors->any())
                         <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">

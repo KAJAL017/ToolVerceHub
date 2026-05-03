@@ -21,12 +21,22 @@ class AdminController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required|min:6',
+            'password' => 'required|min:4',
         ]);
 
-        // Add your authentication logic here
+        // Check credentials
+        if ($request->email === 'super@gmail.com' && $request->password === '2580') {
+            // Store admin session
+            session([
+                'admin_logged_in' => true,
+                'admin_email' => $request->email,
+                'admin_name' => 'Super Admin'
+            ]);
+            
+            return redirect()->route('admin.dashboard')->with('success', 'Login successful!');
+        }
         
-        return redirect()->route('admin.dashboard');
+        return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
     }
 
     /**
@@ -34,6 +44,20 @@ class AdminController extends Controller
      */
     public function dashboard()
     {
+        // Check if admin is logged in
+        if (!session('admin_logged_in')) {
+            return redirect()->route('admin.login')->withErrors(['error' => 'Please login first']);
+        }
+        
         return view('admin.dashboard');
+    }
+    
+    /**
+     * Handle admin logout.
+     */
+    public function logout()
+    {
+        session()->forget(['admin_logged_in', 'admin_email', 'admin_name']);
+        return redirect()->route('admin.login')->with('success', 'Logged out successfully!');
     }
 }
