@@ -49,7 +49,86 @@ class AdminController extends Controller
             return redirect()->route('admin.login')->withErrors(['error' => 'Please login first']);
         }
         
-        return view('admin.dashboard');
+        // Get dynamic statistics
+        $stats = [
+            'total_blogs' => \App\Models\Blog::count(),
+            'published_blogs' => \App\Models\Blog::where('status', 'published')->count(),
+            'draft_blogs' => \App\Models\Blog::where('status', 'draft')->count(),
+            'total_categories' => \App\Models\BlogCategory::count(),
+            'total_tags' => \App\Models\BlogTag::count(),
+            'total_tools' => \App\Models\Tool::count(),
+            'active_tools' => \App\Models\Tool::where('is_active', true)->count(),
+            'total_tool_categories' => \App\Models\ToolCategory::count(),
+            'total_faqs' => \App\Models\Faq::count(),
+            'active_faqs' => \App\Models\Faq::where('is_active', true)->count(),
+            'total_pages' => \App\Models\Page::count(),
+            'total_contacts' => \App\Models\ContactSubmission::count(),
+            'unread_contacts' => \App\Models\ContactSubmission::where('is_read', false)->count(),
+        ];
+        
+        // Get recent blogs
+        $recentBlogs = \App\Models\Blog::with('category')
+            ->latest()
+            ->take(5)
+            ->get();
+        
+        // Get popular blogs (featured ones)
+        $popularBlogs = \App\Models\Blog::where('is_featured', true)
+            ->where('status', 'published')
+            ->latest('published_date')
+            ->take(5)
+            ->get();
+        
+        // Get blog categories with count
+        $categoriesWithCount = \App\Models\BlogCategory::withCount('blogs')
+            ->orderBy('blogs_count', 'desc')
+            ->take(5)
+            ->get();
+        
+        // Get tool categories with count
+        $toolCategoriesWithCount = \App\Models\ToolCategory::withCount('tools')
+            ->orderBy('tools_count', 'desc')
+            ->take(5)
+            ->get();
+        
+        // Monthly blog stats (last 6 months)
+        $monthlyStats = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $count = \App\Models\Blog::whereYear('created_at', $date->year)
+                ->whereMonth('created_at', $date->month)
+                ->count();
+            $monthlyStats[] = [
+                'month' => $date->format('M'),
+                'count' => $count,
+                'percentage' => $count > 0 ? min(($count / max($stats['total_blogs'], 1)) * 100, 100) : 0
+            ];
+        }
+        
+        // Get recent contact submissions
+        $recentContacts = \App\Models\ContactSubmission::latest()
+            ->take(5)
+            ->get();
+        
+        // FAQ stats by category
+        $faqsByCategory = \App\Models\Faq::selectRaw('category, count(*) as count')
+            ->where('is_active', true)
+            ->groupBy('category')
+            ->get();
+        
+        // Share unread contacts count with view
+        view()->share('unreadContactsCount', $stats['unread_contacts']);
+        
+        return view('admin.dashboard', compact(
+            'stats',
+            'recentBlogs',
+            'popularBlogs',
+            'categoriesWithCount',
+            'toolCategoriesWithCount',
+            'monthlyStats',
+            'recentContacts',
+            'faqsByCategory'
+        ));
     }
     
     /**

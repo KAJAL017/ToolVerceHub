@@ -6,314 +6,36 @@
 
 @section('content')
 
-<form action="{{ route('admin.blogs.store') }}" method="POST" enctype="multipart/form-data">
+<div class="mb-4 flex justify-end">
+    <button type="button" id="fillDemoBtn" class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-colors">
+        <i class="fas fa-magic mr-2"></i>
+        Fill Demo Data
+    </button>
+</div>
+
+<form id="blogForm" action="{{ route('admin.blogs.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
     
-    <!-- Author Information (Full Width) -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-            <i class="fas fa-user text-primary-600 mr-2"></i>
-            Author Information
-        </h3>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    Author Name <span class="text-red-500">*</span>
-                </label>
-                <input type="text" name="author_name" value="{{ old('author_name', session('admin_name', 'Admin')) }}" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Author Avatar</label>
-                <input type="file" name="author_avatar" accept="image/*"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Author Emoji</label>
-                <input type="text" name="author_emoji" value="{{ old('author_emoji', '✍️') }}" maxlength="10"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="✍️">
-                <p class="text-xs text-gray-500 mt-1">Emoji to show next to author name</p>
-            </div>
-        </div>
-        
-        <div class="mt-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Author Bio</label>
-            <textarea id="editor-author-bio" name="author_bio" class="w-full">{{ old('author_bio') }}</textarea>
-            <p class="text-xs text-gray-500 mt-1">Short bio about the author (max 500 chars)</p>
-        </div>
-    </div>
-    
-    <!-- Content Section (Full Width) -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-            <i class="fas fa-file-alt text-primary-600 mr-2"></i>
-            Content
-        </h3>
-        
-        <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">TL;DR Summary</label>
-            <textarea id="editor-tldr" name="tldr_summary" class="w-full">{{ old('tldr_summary') }}</textarea>
-            <p class="text-xs text-gray-500 mt-1">Short summary that appears at the top of the blog post</p>
-        </div>
-        
-        <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-                Main Content <span class="text-red-500">*</span>
-            </label>
-            <textarea id="editor-content" name="content" required class="w-full">{{ old('content') }}</textarea>
-            @error('content')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-            <p class="text-xs text-gray-500 mt-1">Use the rich text editor for formatting</p>
-        </div>
-        
-        <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Key Facts</label>
-            <textarea id="editor-key-facts" name="key_facts" class="w-full">{{ old('key_facts') }}</textarea>
-            <p class="text-xs text-gray-500 mt-1">Add key facts as bullet points or numbered list</p>
-        </div>
-        
-        <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Tags</label>
-            <input type="text" name="tags" value="{{ old('tags') }}"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="tag1, tag2, tag3">
-            <p class="text-xs text-gray-500 mt-1">Comma separated</p>
-        </div>
-    </div>
-    
-    <!-- Additional SEO, Badges, TOC, Sidebar Elements (Full Width) -->
-    <div class="space-y-6 mb-6">
-        
-        <!-- Additional SEO Fields -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-link text-primary-600 mr-2"></i>
-                Additional SEO
-            </h3>
-            
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Canonical URL</label>
-                <input type="url" name="canonical_url" value="{{ old('canonical_url') }}"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="https://example.com/blog/post-url">
-                <p class="text-xs text-gray-500 mt-1">Leave empty to use default URL</p>
-            </div>
-        </div>
-        
-        <!-- Badges -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-tags text-primary-600 mr-2"></i>
-                Badges
-            </h3>
-            
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Primary Badge</label>
-                    <input type="text" name="badge_primary" value="{{ old('badge_primary') }}"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="📸 Image Tools Guide">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Secondary Badge</label>
-                    <input type="text" name="badge_secondary" value="{{ old('badge_secondary') }}"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="Beginner Friendly">
-                </div>
-            </div>
-        </div>
-        
-        <!-- Table of Contents -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-list text-primary-600 mr-2"></i>
-                Table of Contents
-            </h3>
-            
-            <div id="toc-container">
-                <div class="toc-item mb-3 p-3 bg-gray-50 rounded-lg">
-                    <div class="grid grid-cols-12 gap-2">
-                        <div class="col-span-3">
-                            <input type="text" name="toc_id[]" placeholder="section-1"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
-                        </div>
-                        <div class="col-span-8">
-                            <input type="text" name="toc_title[]" placeholder="Section Title"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
-                        </div>
-                        <div class="col-span-1">
-                            <button type="button" onclick="removeTocItem(this)" class="w-full px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <button type="button" onclick="addTocItem()" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-                <i class="fas fa-plus mr-2"></i>Add TOC Item
-            </button>
-        </div>
-        
-        <!-- Sidebar Elements -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-sidebar text-primary-600 mr-2"></i>
-                Sidebar Elements
-            </h3>
-            
-            <!-- Sidebar Promos -->
-            <div class="mb-6">
-                <h4 class="text-md font-semibold text-gray-700 mb-3">Sidebar Promos</h4>
-                <div id="sidebar-promos-container"></div>
-                <button type="button" onclick="addSidebarPromo()" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm">
-                    <i class="fas fa-plus mr-2"></i>Add Promo
-                </button>
-            </div>
-            
-            <!-- Quick Links -->
-            <div>
-                <h4 class="text-md font-semibold text-gray-700 mb-3">Quick Links</h4>
-                <div id="quick-links-container"></div>
-                <button type="button" onclick="addQuickLink()" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm">
-                    <i class="fas fa-plus mr-2"></i>Add Link
-                </button>
-            </div>
-        </div>
-        
-        <!-- Tool Boxes -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-toolbox text-primary-600 mr-2"></i>
-                Tool Boxes
-            </h3>
-            
-            <div id="toolbox-container"></div>
-            <button type="button" onclick="addToolBox()" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-                <i class="fas fa-plus mr-2"></i>Add Tool Box
-            </button>
-        </div>
-        
-        <!-- Steps -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-shoe-prints text-primary-600 mr-2"></i>
-                Step-by-Step Guide
-            </h3>
-            
-            <div id="steps-container"></div>
-            <button type="button" onclick="addStep()" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-                <i class="fas fa-plus mr-2"></i>Add Step
-            </button>
-        </div>
-        
-        <!-- Callouts -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-exclamation-circle text-primary-600 mr-2"></i>
-                Callout Boxes
-            </h3>
-            
-            <div id="callouts-container"></div>
-            <button type="button" onclick="addCallout()" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-                <i class="fas fa-plus mr-2"></i>Add Callout
-            </button>
-        </div>
-        
-        <!-- FAQs -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-question-circle text-primary-600 mr-2"></i>
-                FAQs
-            </h3>
-            
-            <div id="faqs-container"></div>
-            <button type="button" onclick="addFaq()" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-                <i class="fas fa-plus mr-2"></i>Add FAQ
-            </button>
-        </div>
-        
-        <!-- Conclusion -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-flag-checkered text-primary-600 mr-2"></i>
-                Conclusion Section
-            </h3>
-            
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Conclusion Title</label>
-                <input type="text" name="conclusion_title" value="{{ old('conclusion_title') }}"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="Ready to Start?">
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Conclusion Content</label>
-                <textarea id="editor-conclusion" name="conclusion_content" class="w-full">{{ old('conclusion_content') }}</textarea>
-            </div>
-            
-            <div id="conclusion-buttons-container"></div>
-            <button type="button" onclick="addConclusionButton()" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-                <i class="fas fa-plus mr-2"></i>Add Button
-            </button>
-        </div>
-        
-        <!-- Comparison Table -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-table text-primary-600 mr-2"></i>
-                Comparison Table (Optional)
-            </h3>
-            
-            <p class="text-sm text-gray-600 mb-4">Leave empty if not needed. Use TinyMCE editor tables for complex tables.</p>
-            
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Table Headers (comma-separated)</label>
-                <input type="text" name="comparison_headers" value="{{ old('comparison_headers') }}"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="Feature, PNG, JPG">
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Table Rows (one row per line, cells separated by commas)</label>
-                <textarea name="comparison_rows" rows="4"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="Compression, Lossless, Lossy&#10;File Size, Large, Small&#10;Quality, Perfect, Good">{{ old('comparison_rows') }}</textarea>
-            </div>
-        </div>
-        
-    </div>
-    
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Main Content (Left Side) -->
         <div class="lg:col-span-2 space-y-6">
             
-            <!-- Basic Information -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
                     <i class="fas fa-info-circle text-primary-600 mr-2"></i>
                     Basic Information
                 </h3>
                 
-                <!-- Title -->
                 <div class="mb-4">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
                         Title <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="title" value="{{ old('title') }}" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 @error('title') border-red-500 @enderror"
+                    <input type="text" name="title" id="title" value="{{ old('title') }}" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="Enter blog title">
-                    @error('title')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
+                    <p class="text-red-500 text-sm mt-1 hidden" id="error-title"></p>
                 </div>
                 
-                <!-- Slug -->
                 <div class="mb-4">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
                         Slug <span class="text-gray-500 text-xs">(Leave empty to auto-generate)</span>
@@ -326,56 +48,60 @@
                     @enderror
                 </div>
                 
-                <!-- Category & Color -->
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Category</label>
-                        <select name="category_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-                            <option value="">Select Category</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+                    <select name="category_id" id="categorySelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        <option value="">Select Category</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Featured Image or Icon</label>
+                    <p class="text-xs text-gray-500 mb-3">Choose either an image OR an icon/emoji (not both)</p>
                     
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            Category Color <span class="text-red-500">*</span>
-                        </label>
-                        <div class="flex gap-3">
-                            <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="category_color" value="g" {{ old('category_color', 'g') == 'g' ? 'checked' : '' }} class="mr-2">
-                                <span class="w-6 h-6 bg-green-500 rounded-full"></span>
-                            </label>
-                            <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="category_color" value="c" {{ old('category_color') == 'c' ? 'checked' : '' }} class="mr-2">
-                                <span class="w-6 h-6 bg-orange-500 rounded-full"></span>
-                            </label>
-                            <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="category_color" value="b" {{ old('category_color') == 'b' ? 'checked' : '' }} class="mr-2">
-                                <span class="w-6 h-6 bg-blue-500 rounded-full"></span>
-                            </label>
-                            <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="category_color" value="a" {{ old('category_color') == 'a' ? 'checked' : '' }} class="mr-2">
-                                <span class="w-6 h-6 bg-yellow-500 rounded-full"></span>
-                            </label>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Upload Image</label>
+                            <input type="file" name="featured_image" id="featuredImageInput" accept="image/*"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        </div>
+                        
+                        <div class="text-center text-gray-400 text-sm">OR</div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Choose Icon/Emoji</label>
+                            <select name="featured_icon" id="featuredIconInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                <option value="">Select an icon...</option>
+                                @foreach($icons as $icon)
+                                    <option value="{{ $icon->icon }}" {{ old('featured_icon') == $icon->icon ? 'selected' : '' }}>
+                                        {{ $icon->icon }} {{ $icon->name }} ({{ $icon->category }})
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- SEO & Meta -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                    <i class="fas fa-search text-primary-600 mr-2"></i>
-                    SEO & Meta Information
-                </h3>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-search text-primary-600 mr-2"></i>
+                        SEO & Meta Information
+                    </h3>
+                    <button type="button" id="autoFillSeoBtn" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-lg transition-colors">
+                        <i class="fas fa-magic mr-2"></i>Auto-Fill SEO
+                    </button>
+                </div>
                 
                 <div class="mb-4">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Meta Title</label>
-                    <input type="text" name="meta_title" value="{{ old('meta_title') }}" maxlength="60"
+                    <input type="text" name="meta_title" id="metaTitle" value="{{ old('meta_title') }}" maxlength="60"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="SEO title (max 60 chars)">
                     <p class="text-xs text-gray-500 mt-1">Leave empty to use blog title</p>
@@ -383,40 +109,23 @@
                 
                 <div class="mb-4">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Meta Description</label>
-                    <textarea name="meta_description" rows="3" maxlength="160"
+                    <textarea name="meta_description" id="metaDescription" rows="3" maxlength="160"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="SEO description (max 160 chars)">{{ old('meta_description') }}</textarea>
                 </div>
                 
                 <div class="mb-4">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">SEO Keywords</label>
-                    <input type="text" name="seo_keywords" value="{{ old('seo_keywords') }}"
+                    <input type="text" name="seo_keywords" id="seoKeywords" value="{{ old('seo_keywords') }}"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="keyword1, keyword2, keyword3">
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Featured Image</label>
-                        <input type="file" name="featured_image" accept="image/*"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Featured Emoji</label>
-                        <input type="text" name="featured_image_emoji" value="{{ old('featured_image_emoji') }}" maxlength="10"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                            placeholder="🖼️">
-                    </div>
                 </div>
             </div>
             
         </div>
         
-        <!-- Sidebar (Right Side) -->
         <div class="space-y-6">
             
-            <!-- Publishing -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
                     <i class="fas fa-calendar text-primary-600 mr-2"></i>
@@ -451,7 +160,6 @@
                 </div>
             </div>
             
-            <!-- Features -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
                     <i class="fas fa-star text-primary-600 mr-2"></i>
@@ -473,12 +181,12 @@
                 </div>
             </div>
             
-            <!-- Actions -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <div class="space-y-3">
-                    <button type="submit" class="w-full px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-lg transition-colors">
+                    <button type="submit" id="submitBtn" class="w-full px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-lg transition-colors">
                         <i class="fas fa-save mr-2"></i>
-                        Create Blog
+                        <span id="btnText">Create Blog</span>
+                    </button>
                     </button>
                     
                     <a href="{{ route('admin.blogs.index') }}" class="block w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-lg text-center transition-colors">
@@ -488,6 +196,251 @@
                 </div>
             </div>
             
+        </div>
+        
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-file-alt text-primary-600 mr-2"></i>
+            Content
+        </h3>
+        
+        <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">TL;DR Summary</label>
+            <textarea id="editor-tldr" name="tldr_summary" class="w-full">{{ old('tldr_summary') }}</textarea>
+            <p class="text-xs text-gray-500 mt-1">Short summary that appears at the top of the blog post</p>
+        </div>
+        
+        <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Main Content <span class="text-red-500">*</span>
+            </label>
+            <textarea id="editor-content" name="content" class="w-full">{{ old('content') }}</textarea>
+            @error('content')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+            <p class="text-xs text-gray-500 mt-1">Use the rich text editor for formatting</p>
+        </div>
+        
+        <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Key Facts</label>
+            <textarea id="editor-key-facts" name="key_facts" class="w-full">{{ old('key_facts') }}</textarea>
+            <p class="text-xs text-gray-500 mt-1">Add key facts as bullet points or numbered list</p>
+        </div>
+        
+        <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Tags</label>
+            <select name="tags[]" id="tagsSelect" multiple class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                @foreach($tags as $tag)
+                    <option value="{{ $tag->name }}">{{ $tag->name }}</option>
+                @endforeach
+            </select>
+            <p class="text-xs text-gray-500 mt-1">Select multiple tags</p>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-user text-primary-600 mr-2"></i>
+            Author Information
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Author Name <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="author_name" value="{{ old('author_name', session('admin_name', 'Admin')) }}" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Author Avatar</label>
+                <input type="file" name="author_avatar" accept="image/*"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Author Bio</label>
+            <textarea id="editor-author-bio" name="author_bio" class="w-full">{{ old('author_bio') }}</textarea>
+            <p class="text-xs text-gray-500 mt-1">Short bio about the author (max 500 chars)</p>
+        </div>
+    </div>
+    
+    <div class="space-y-6 mb-6">
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-link text-primary-600 mr-2"></i>
+                Additional SEO
+            </h3>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Canonical URL</label>
+                <input type="text" name="canonical_url" value="{{ old('canonical_url') }}"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    placeholder="https://example.com/blog/post-url">
+                <p class="text-xs text-gray-500 mt-1">Leave empty to use default URL</p>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-tags text-primary-600 mr-2"></i>
+                Badges
+            </h3>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Primary Badge</label>
+                    <input type="text" name="badge_primary" value="{{ old('badge_primary') }}"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="📸 Image Tools Guide">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Secondary Badge</label>
+                    <input type="text" name="badge_secondary" value="{{ old('badge_secondary') }}"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="Beginner Friendly">
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-list text-primary-600 mr-2"></i>
+                Table of Contents
+            </h3>
+            
+            <div class="mb-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+                <p class="text-sm text-blue-800 mb-2"><strong>💡 How TOC Works:</strong></p>
+                <ul class="text-sm text-blue-700 space-y-1 ml-4">
+                    <li>• <strong>ID:</strong> URL-friendly identifier (e.g., "what-is-compression")</li>
+                    <li>• <strong>Title:</strong> Exact heading text from your content</li>
+                    <li>• JavaScript will automatically link TOC to matching headings</li>
+                    <li>• <strong>Manual Method:</strong> In content editor, click "Code" button and add: <code class="bg-white px-1">&lt;h2 id="your-id"&gt;Heading&lt;/h2&gt;</code></li>
+                </ul>
+            </div>
+            
+            <div id="toc-container">
+                <div class="toc-item mb-3 p-3 bg-gray-50 rounded-lg">
+                    <div class="grid grid-cols-12 gap-2">
+                        <div class="col-span-3">
+                            <input type="text" name="toc_id[]" placeholder="section-1"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
+                        </div>
+                        <div class="col-span-8">
+                            <input type="text" name="toc_title[]" placeholder="Section Title"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
+                        </div>
+                        <div class="col-span-1">
+                            <button type="button" onclick="removeTocItem(this)" class="w-full px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button type="button" onclick="addTocItem()" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+                <i class="fas fa-plus mr-2"></i>Add TOC Item
+            </button>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-sidebar text-primary-600 mr-2"></i>
+                Sidebar Elements
+            </h3>
+            
+            <div class="mb-6">
+                <h4 class="text-md font-semibold text-gray-700 mb-3">Sidebar Promos</h4>
+                <div id="sidebar-promos-container"></div>
+                <button type="button" onclick="addSidebarPromo()" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm">
+                    <i class="fas fa-plus mr-2"></i>Add Promo
+                </button>
+            </div>
+            
+            <div>
+                <h4 class="text-md font-semibold text-gray-700 mb-3">Quick Links</h4>
+                <div id="quick-links-container"></div>
+                <button type="button" onclick="addQuickLink()" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm">
+                    <i class="fas fa-plus mr-2"></i>Add Link
+                </button>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-toolbox text-primary-600 mr-2"></i>
+                Tool Boxes
+            </h3>
+            
+            <div id="toolbox-container"></div>
+            <button type="button" onclick="addToolBox()" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+                <i class="fas fa-plus mr-2"></i>Add Tool Box
+            </button>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-shoe-prints text-primary-600 mr-2"></i>
+                Step-by-Step Guide
+            </h3>
+            
+            <div id="steps-container"></div>
+            <button type="button" onclick="addStep()" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+                <i class="fas fa-plus mr-2"></i>Add Step
+            </button>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-exclamation-circle text-primary-600 mr-2"></i>
+                Callout Boxes
+            </h3>
+            
+            <div id="callouts-container"></div>
+            <button type="button" onclick="addCallout()" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+                <i class="fas fa-plus mr-2"></i>Add Callout
+            </button>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-question-circle text-primary-600 mr-2"></i>
+                FAQs
+            </h3>
+            
+            <div id="faqs-container"></div>
+            <button type="button" onclick="addFaq()" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+                <i class="fas fa-plus mr-2"></i>Add FAQ
+            </button>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-flag-checkered text-primary-600 mr-2"></i>
+                Conclusion Section
+            </h3>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Conclusion Title</label>
+                <input type="text" name="conclusion_title" value="{{ old('conclusion_title') }}"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    placeholder="Ready to Start?">
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Conclusion Content</label>
+                <textarea id="editor-conclusion" name="conclusion_content" class="w-full">{{ old('conclusion_content') }}</textarea>
+            </div>
+            
+            <div id="conclusion-buttons-container"></div>
+            <button type="button" onclick="addConclusionButton()" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+                <i class="fas fa-plus mr-2"></i>Add Button
+            </button>
         </div>
         
     </div>
@@ -508,98 +461,355 @@
 @endsection
 
 @section('scripts')
-<!-- TinyMCE Editor JS -->
 <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.2/tinymce.min.js"></script>
 <script>
-    console.log('TinyMCE script loaded');
+    function fillDemoData() {
+        document.querySelector('input[name="title"]').value = 'Complete Guide to Web Development in 2026';
+        document.querySelector('input[name="slug"]').value = 'complete-guide-web-development-2026';
+        document.querySelector('input[name="author_name"]').value = 'John Smith';
+        document.querySelector('input[name="published_date"]').value = '2026-05-03';
+        document.querySelector('input[name="read_time"]').value = '15';
+        document.querySelector('select[name="status"]').value = 'published';
+        
+        const categorySelect = document.querySelector('select[name="category_id"]');
+        if (categorySelect && categorySelect.options.length > 1) {
+            categorySelect.selectedIndex = 1;
+            const event = new Event('change', { bubbles: true });
+            categorySelect.dispatchEvent(event);
+        }
+        
+        const iconSelect = document.querySelector('select[name="featured_icon"]');
+        if (iconSelect && iconSelect.options.length > 1) {
+            iconSelect.selectedIndex = 1;
+            const event = new Event('change', { bubbles: true });
+            iconSelect.dispatchEvent(event);
+        }
+        
+        if (typeof tinymce !== 'undefined' && tinymce.get('editor-content')) {
+            tinymce.get('editor-content').setContent(`
+                <h2>Introduction</h2>
+                <p>Web development has evolved significantly over the years. In this comprehensive guide, we'll explore the latest trends, tools, and best practices for modern web development.</p>
+                
+                <h2>Key Technologies</h2>
+                <p>Modern web development relies on several key technologies:</p>
+                <ul>
+                    <li>HTML5 for structure</li>
+                    <li>CSS3 for styling</li>
+                    <li>JavaScript for interactivity</li>
+                    <li>React, Vue, or Angular for frontend frameworks</li>
+                    <li>Node.js for backend development</li>
+                </ul>
+                
+                <h2>Best Practices</h2>
+                <p>Following best practices ensures your web applications are maintainable, scalable, and performant. Always write clean code, use version control, and test thoroughly.</p>
+                
+                <h2>Conclusion</h2>
+                <p>Web development continues to be an exciting field with endless possibilities. Stay curious, keep learning, and build amazing things!</p>
+            `);
+        }
+        
+        document.querySelector('input[name="meta_title"]').value = 'Complete Guide to Web Development in 2026 | Learn Web Dev';
+        document.querySelector('textarea[name="meta_description"]').value = 'Learn everything about modern web development in 2026. Complete guide covering HTML, CSS, JavaScript, frameworks, and best practices.';
+        document.querySelector('input[name="seo_keywords"]').value = 'web development, programming, HTML, CSS, JavaScript, React, tutorial';
+        
+        const tldrInput = document.querySelector('textarea[name="tldr_summary"]');
+        if (tldrInput) {
+            tldrInput.value = 'This guide covers everything you need to know about modern web development, from basic HTML to advanced frameworks.';
+        }
+        
+        const badgePrimary = document.querySelector('input[name="badge_primary"]');
+        if (badgePrimary) badgePrimary.value = 'Trending';
+        
+        const badgeSecondary = document.querySelector('input[name="badge_secondary"]');
+        if (badgeSecondary) badgeSecondary.value = 'Popular';
+        
+        const addPromoBtn = document.querySelector('button[onclick*="addPromo"]');
+        if (addPromoBtn) {
+            addPromoBtn.click();
+            setTimeout(() => {
+                const promoInputs = document.querySelectorAll('input[name="promo_name[]"]');
+                if (promoInputs.length > 0) {
+                    const lastIndex = promoInputs.length - 1;
+                    document.querySelectorAll('input[name="promo_emoji[]"]')[lastIndex].value = '🚀';
+                    document.querySelectorAll('input[name="promo_name[]"]')[lastIndex].value = 'Premium Course';
+                    document.querySelectorAll('textarea[name="promo_description[]"]')[lastIndex].value = 'Learn web development from scratch';
+                    document.querySelectorAll('input[name="promo_link_text[]"]')[lastIndex].value = 'Enroll Now';
+                    document.querySelectorAll('input[name="promo_link_url[]"]')[lastIndex].value = '#';
+                }
+            }, 100);
+        }
+        
+        const addLinkBtn = document.querySelector('button[onclick*="addQuickLink"]');
+        if (addLinkBtn) {
+            addLinkBtn.click();
+            setTimeout(() => {
+                const linkInputs = document.querySelectorAll('input[name="quick_link_text[]"]');
+                if (linkInputs.length > 0) {
+                    const lastIndex = linkInputs.length - 1;
+                    document.querySelectorAll('input[name="quick_link_text[]"]')[lastIndex].value = 'Download Resources';
+                    document.querySelectorAll('input[name="quick_link_url[]"]')[lastIndex].value = '#';
+                }
+            }, 100);
+        }
+        
+        const addToolboxBtn = document.querySelector('button[onclick*="addToolBox"]');
+        if (addToolboxBtn) {
+            addToolboxBtn.click();
+            setTimeout(() => {
+                const toolboxInputs = document.querySelectorAll('input[name="toolbox_title[]"]');
+                if (toolboxInputs.length > 0) {
+                    const lastIndex = toolboxInputs.length - 1;
+                    document.querySelectorAll('input[name="toolbox_emoji[]"]')[lastIndex].value = '🛠️';
+                    document.querySelectorAll('input[name="toolbox_title[]"]')[lastIndex].value = 'Developer Tools';
+                    document.querySelectorAll('textarea[name="toolbox_description[]"]')[lastIndex].value = 'Essential tools for web developers';
+                    document.querySelectorAll('input[name="toolbox_button_text[]"]')[lastIndex].value = 'View Tools';
+                    document.querySelectorAll('input[name="toolbox_button_url[]"]')[lastIndex].value = '#';
+                }
+            }, 100);
+        }
+        
+        const addStepBtn = document.querySelector('button[onclick*="addStep"]');
+        if (addStepBtn) {
+            addStepBtn.click();
+            setTimeout(() => {
+                const stepInputs = document.querySelectorAll('input[name="step_title[]"]');
+                if (stepInputs.length > 0) {
+                    const lastIndex = stepInputs.length - 1;
+                    document.querySelectorAll('input[name="step_number[]"]')[lastIndex].value = '1';
+                    document.querySelectorAll('input[name="step_title[]"]')[lastIndex].value = 'Setup Development Environment';
+                    document.querySelectorAll('textarea[name="step_description[]"]')[lastIndex].value = 'Install Node.js, VS Code, and necessary extensions';
+                }
+            }, 100);
+        }
+        
+        const addCalloutBtn = document.querySelector('button[onclick*="addCallout"]');
+        if (addCalloutBtn) {
+            addCalloutBtn.click();
+            setTimeout(() => {
+                const calloutInputs = document.querySelectorAll('textarea[name="callout_content[]"]');
+                if (calloutInputs.length > 0) {
+                    const lastIndex = calloutInputs.length - 1;
+                    document.querySelectorAll('select[name="callout_type[]"]')[lastIndex].value = 'tip';
+                    document.querySelectorAll('input[name="callout_icon[]"]')[lastIndex].value = '💡';
+                    document.querySelectorAll('textarea[name="callout_content[]"]')[lastIndex].value = 'Pro tip: Always use version control for your projects!';
+                }
+            }, 100);
+        }
+        
+        const addFaqBtn = document.querySelector('button[onclick*="addFaq"]');
+        if (addFaqBtn) {
+            addFaqBtn.click();
+            setTimeout(() => {
+                const faqInputs = document.querySelectorAll('input[name="faq_question[]"]');
+                if (faqInputs.length > 0) {
+                    const lastIndex = faqInputs.length - 1;
+                    document.querySelectorAll('input[name="faq_question[]"]')[lastIndex].value = 'What is web development?';
+                    document.querySelectorAll('textarea[name="faq_answer[]"]')[lastIndex].value = 'Web development is the process of building and maintaining websites and web applications.';
+                }
+            }, 100);
+        }
+        
+        setTimeout(() => {
+            if (typeof showToast === 'function') {
+                showToast('Demo data filled successfully! Check all sections.', 'success');
+            }
+        }, 500);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializePage);
+    } else {
+        initializePage();
+    }
     
-    
-    // Initialize TinyMCE editors
-    tinymce.init({
-        selector: '#editor-content',
-        height: 500,
-        menubar: false,
-        plugins: [
-            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
-            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-            'insertdatetime', 'media', 'table', 'preview', 'help', 'wordcount'
-        ],
-        toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjust | bullist numlist outdent indent | table | link image | removeformat | code | help',
-        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }' +
-            'table { border-collapse: collapse; width: 100%; margin: 20px 0; }' +
-            'table td, table th { border: 1px solid #ddd; padding: 8px; }' +
-            'table th { background-color: #f3f4f6; font-weight: 600; }',
-        paste_data_images: true,
-        paste_as_text: false,
-        paste_enable_default_filters: false,
-        paste_word_valid_elements: "table,tr,td,th,tbody,thead,tfoot,p,b,strong,i,em,h1,h2,h3,h4,h5,h6,ul,ol,li",
-        table_default_attributes: { border: '1' },
-        table_default_styles: { 'border-collapse': 'collapse', 'width': '100%' },
-        promotion: false,
-        branding: false
+    function initializePage() {
+        const fillDemoBtn = document.getElementById('fillDemoBtn');
+        if (fillDemoBtn) {
+            fillDemoBtn.addEventListener('click', fillDemoData);
+        }
+        
+        const categorySelect = document.getElementById('categorySelect');
+        if (categorySelect) {
+            initCustomSelect(categorySelect);
+        }
+        
+        const tagsSelect = document.getElementById('tagsSelect');
+        if (tagsSelect) {
+            initCustomMultiSelect(tagsSelect);
+        }
+
+        const iconSelect = document.getElementById('featuredIconInput');
+        if (iconSelect) {
+            initCustomSelect(iconSelect);
+        }
+
+        const featuredImageInput = document.getElementById('featuredImageInput');
+        const featuredIconInput = document.getElementById('featuredIconInput');
+        
+        if (featuredImageInput && featuredIconInput) {
+            featuredImageInput.addEventListener('change', function() {
+                if (this.files && this.files.length > 0) {
+                    featuredIconInput.value = '';
+                    featuredIconInput.disabled = true;
+                    const wrapper = featuredIconInput.closest('.custom-select');
+                    if (wrapper) {
+                        wrapper.style.opacity = '0.5';
+                        wrapper.style.pointerEvents = 'none';
+                    }
+                } else {
+                    featuredIconInput.disabled = false;
+                    const wrapper = featuredIconInput.closest('.custom-select');
+                    if (wrapper) {
+                        wrapper.style.opacity = '1';
+                        wrapper.style.pointerEvents = 'auto';
+                    }
+                }
+            });
+            
+            featuredIconInput.addEventListener('change', function() {
+                if (this.value.trim() !== '') {
+                    featuredImageInput.disabled = true;
+                    featuredImageInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+                } else {
+                    featuredImageInput.disabled = false;
+                    featuredImageInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
+                }
+            });
+        }
+
+        const autoFillSeoBtn = document.getElementById('autoFillSeoBtn');
+        if (autoFillSeoBtn) {
+            autoFillSeoBtn.addEventListener('click', function() {
+                const title = document.querySelector('input[name="title"]').value;
+                const slug = document.querySelector('input[name="slug"]').value;
+                
+                if (!title) {
+                    showToast('Please enter a title first', 'warning');
+                    return;
+                }
+
+                const metaTitle = title.substring(0, 60);
+                document.getElementById('metaTitle').value = metaTitle;
+
+                const metaDescription = `Learn about ${title}. Complete guide and tutorial.`.substring(0, 160);
+                document.getElementById('metaDescription').value = metaDescription;
+
+                const keywords = title.toLowerCase()
+                    .replace(/[^\w\s]/g, '')
+                    .split(/\s+/)
+                    .filter(word => word.length > 3)
+                    .slice(0, 5)
+                    .join(', ');
+                document.getElementById('seoKeywords').value = keywords;
+
+                showToast('SEO fields auto-filled successfully!', 'success');
+            });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const fullEditorConfig = {
+            height: 500,
+            menubar: 'file edit view insert format tools table help',
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons',
+                'codesample'
+            ],
+            toolbar: 'undo redo | blocks fontsize | bold italic underline strikethrough | forecolor backcolor | ' +
+                     'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | ' +
+                     'table tabledelete | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | ' +
+                     'tableinsertcolbefore tableinsertcolafter tabledeletecol | ' +
+                     'link image media codesample | emoticons charmap | ' +
+                     'removeformat code fullscreen | help',
+            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height: 1.6; }' +
+                'table { border-collapse: collapse; width: 100%; margin: 20px 0; }' +
+                'table td, table th { border: 1px solid #ddd; padding: 12px; }' +
+                'table th { background-color: #f3f4f6; font-weight: 600; text-align: left; }' +
+                'table tr:nth-child(even) { background-color: #f9fafb; }' +
+                'img { max-width: 100%; height: auto; }' +
+                'code { background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-family: monospace; }' +
+                'pre { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 8px; overflow-x: auto; }',
+            paste_data_images: true,
+            paste_as_text: false,
+            paste_enable_default_filters: false,
+            paste_word_valid_elements: "table,tr,td,th,tbody,thead,tfoot,p,b,strong,i,em,h1,h2,h3,h4,h5,h6,ul,ol,li,a,img,code,pre",
+            table_default_attributes: { border: '1' },
+            table_default_styles: { 'border-collapse': 'collapse', 'width': '100%' },
+            image_advtab: true,
+            image_caption: true,
+            image_title: true,
+            automatic_uploads: true,
+            file_picker_types: 'image',
+            promotion: false,
+            branding: false,
+            statusbar: true,
+            resize: true
+        };
+
+        tinymce.init({
+            ...fullEditorConfig,
+            selector: '#editor-content',
+            height: 500
+        });
+        
+        tinymce.init({
+            ...fullEditorConfig,
+            selector: '#editor-tldr',
+            height: 250
+        });
+        
+        tinymce.init({
+            ...fullEditorConfig,
+            selector: '#editor-author-bio',
+            height: 200
+        });
+        
+        tinymce.init({
+            ...fullEditorConfig,
+            selector: '#editor-conclusion',
+            height: 250
+        });
+        
+        tinymce.init({
+            ...fullEditorConfig,
+            selector: '#editor-key-facts',
+            height: 300
+        });
+
+
+        const titleInput = document.querySelector('input[name="title"]');
+        const slugInput = document.querySelector('input[name="slug"]');
+        let manuallyEdited = false;
+
+        slugInput.addEventListener('input', function() {
+            if (this.value !== '') {
+                manuallyEdited = true;
+            }
+        });
+
+        titleInput.addEventListener('input', function() {
+            if (!manuallyEdited) {
+                const slug = generateSlug(this.value);
+                slugInput.value = slug;
+            }
+        });
+
+        function generateSlug(text) {
+            return text
+                .toLowerCase()
+                .trim()
+                .replace(/[^\w\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
     });
-    
-    tinymce.init({
-        selector: '#editor-tldr',
-        height: 200,
-        menubar: false,
-        plugins: ['lists', 'link', 'table', 'wordcount'],
-        toolbar: 'bold italic | bullist numlist | link | table',
-        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }' +
-            'table { border-collapse: collapse; width: 100%; }' +
-            'table td, table th { border: 1px solid #ddd; padding: 8px; }',
-        paste_data_images: false,
-        promotion: false,
-        branding: false
-    });
-    
-    tinymce.init({
-        selector: '#editor-author-bio',
-        height: 150,
-        menubar: false,
-        plugins: ['link', 'table'],
-        toolbar: 'bold italic underline | link | table',
-        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }' +
-            'table { border-collapse: collapse; width: 100%; }' +
-            'table td, table th { border: 1px solid #ddd; padding: 8px; }',
-        promotion: false,
-        branding: false
-    });
-    
-    tinymce.init({
-        selector: '#editor-conclusion',
-        height: 200,
-        menubar: false,
-        plugins: ['lists', 'link', 'table', 'wordcount'],
-        toolbar: 'bold italic | bullist numlist | link | table',
-        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }' +
-            'table { border-collapse: collapse; width: 100%; }' +
-            'table td, table th { border: 1px solid #ddd; padding: 8px; }',
-        promotion: false,
-        branding: false
-    });
-    
-    tinymce.init({
-        selector: '#editor-key-facts',
-        height: 250,
-        menubar: false,
-        plugins: ['lists', 'link', 'table', 'wordcount'],
-        toolbar: 'bold italic | bullist numlist | link | table',
-        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }' +
-            'table { border-collapse: collapse; width: 100%; }' +
-            'table td, table th { border: 1px solid #ddd; padding: 8px; }',
-        paste_data_images: false,
-        promotion: false,
-        branding: false
-    });
-    
-    console.log('All TinyMCE editors initialized');
-    
-    // ============================================
-    // Dynamic Form Functions
-    // ============================================
-    
-    // TOC Functions
+
+
+
+
     function addTocItem() {
         const container = document.getElementById('toc-container');
         const div = document.createElement('div');
@@ -627,8 +837,7 @@
     function removeTocItem(btn) {
         btn.closest('.toc-item').remove();
     }
-    
-    // Tool Box Functions
+
     let toolboxCounter = 0;
     function addToolBox() {
         const container = document.getElementById('toolbox-container');
@@ -659,7 +868,7 @@
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
                 </div>
                 <div>
-                    <input type="url" name="toolbox_button_url[]" placeholder="https://example.com"
+                    <input type="text" name="toolbox_button_url[]" placeholder="https://example.com"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
                 </div>
                 <div>
@@ -678,8 +887,7 @@
     function removeToolBox(btn) {
         btn.closest('.toolbox-item').remove();
     }
-    
-    // Steps Functions
+
     let stepCounter = 0;
     function addStep() {
         const container = document.getElementById('steps-container');
@@ -713,8 +921,7 @@
     function removeStep(btn) {
         btn.closest('.step-item').remove();
     }
-    
-    // Callout Functions
+
     let calloutCounter = 0;
     function addCallout() {
         const container = document.getElementById('callouts-container');
@@ -752,8 +959,7 @@
     function removeCallout(btn) {
         btn.closest('.callout-item').remove();
     }
-    
-    // FAQ Functions
+
     let faqCounter = 0;
     function addFaq() {
         const container = document.getElementById('faqs-container');
@@ -783,8 +989,7 @@
     function removeFaq(btn) {
         btn.closest('.faq-item').remove();
     }
-    
-    // Conclusion Button Functions
+
     let conclusionBtnCounter = 0;
     function addConclusionButton() {
         const container = document.getElementById('conclusion-buttons-container');
@@ -803,7 +1008,7 @@
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
                 </div>
                 <div>
-                    <input type="url" name="conclusion_btn_url[]" placeholder="https://example.com"
+                    <input type="text" name="conclusion_btn_url[]" placeholder="https://example.com"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
                 </div>
                 <div>
@@ -822,8 +1027,7 @@
     function removeConclusionButton(btn) {
         btn.closest('.conclusion-btn-item').remove();
     }
-    
-    // Sidebar Promo Functions
+
     let promoCounter = 0;
     function addSidebarPromo() {
         const container = document.getElementById('sidebar-promos-container');
@@ -848,7 +1052,7 @@
                 <div class="grid grid-cols-3 gap-2">
                     <input type="text" name="promo_link_text[]" placeholder="Try Free"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
-                    <input type="url" name="promo_link_url[]" placeholder="https://example.com"
+                    <input type="text" name="promo_link_url[]" placeholder="https://example.com"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
                     <select name="promo_color[]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
                         <option value="g">Green</option>
@@ -865,8 +1069,7 @@
     function removeSidebarPromo(btn) {
         btn.closest('.promo-item').remove();
     }
-    
-    // Quick Link Functions
+
     let quickLinkCounter = 0;
     function addQuickLink() {
         const container = document.getElementById('quick-links-container');
@@ -882,7 +1085,7 @@
             <div class="grid grid-cols-3 gap-2">
                 <input type="text" name="quick_link_text[]" placeholder="Link Text"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
-                <input type="url" name="quick_link_url[]" placeholder="https://example.com"
+                <input type="text" name="quick_link_url[]" placeholder="https://example.com"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
                 <select name="quick_link_color[]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm">
                     <option value="g">Green</option>
@@ -898,5 +1101,134 @@
     function removeQuickLink(btn) {
         btn.closest('.quick-link-item').remove();
     }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeAjaxForm);
+    } else {
+        initializeAjaxForm();
+    }
+    
+    function initializeAjaxForm() {
+        const form = document.getElementById('blogForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        
+        if (!form) return;
+        
+        function clearErrors() {
+            document.querySelectorAll('[id^="error-"]').forEach(el => {
+                el.textContent = '';
+                el.classList.add('hidden');
+            });
+            document.querySelectorAll('input, textarea, select').forEach(el => {
+                el.classList.remove('border-red-500');
+            });
+        }
+        
+        function showError(fieldName, message) {
+            const errorEl = document.getElementById('error-' + fieldName);
+            const inputEl = document.getElementById(fieldName) || document.querySelector(`[name="${fieldName}"]`);
+            
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.classList.remove('hidden');
+            } else {
+                if (inputEl && inputEl.parentElement) {
+                    const newError = document.createElement('p');
+                    newError.id = 'error-' + fieldName;
+                    newError.className = 'text-red-500 text-sm mt-1';
+                    newError.textContent = message;
+                    inputEl.parentElement.appendChild(newError);
+                }
+            }
+            
+            if (inputEl) {
+                inputEl.classList.add('border-red-500');
+                if (document.querySelectorAll('.border-red-500').length === 1) {
+                    inputEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            clearErrors();
+            
+            if (typeof tinymce !== 'undefined') {
+                tinymce.triggerSave();
+            }
+            
+            const content = document.querySelector('textarea[name="content"]').value;
+            if (!content || content.trim() === '') {
+                showError('content', 'The content field is required.');
+                if (typeof showToast === 'function') {
+                    showToast('Please enter blog content', 'error');
+                }
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            btnText.textContent = 'Creating...';
+            
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw data;
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect || '{{ route("admin.blogs.index") }}';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                
+                if (error.errors) {
+                    Object.keys(error.errors).forEach(fieldName => {
+                        const messages = error.errors[fieldName];
+                        if (Array.isArray(messages) && messages.length > 0) {
+                            showError(fieldName, messages[0]);
+                        }
+                    });
+                    
+                    if (typeof showToast === 'function') {
+                        showToast('Please fix the errors below', 'error');
+                    }
+                } else if (error.message) {
+                    if (typeof showToast === 'function') {
+                        showToast(error.message, 'error');
+                    }
+                } else {
+                    if (typeof showToast === 'function') {
+                        showToast('An error occurred. Please try again.', 'error');
+                    }
+                }
+                
+                submitBtn.disabled = false;
+                btnText.textContent = 'Create Blog';
+            });
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeAjaxForm);
+    } else {
+        initializeAjaxForm();
+    }
 </script>
 @endsection
+

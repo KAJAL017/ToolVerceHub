@@ -15,11 +15,35 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Create admin user if not exists
+        if (!User::where('email', 'super@gmail.com')->exists()) {
+            User::factory()->create([
+                'name' => 'Admin User',
+                'email' => 'super@gmail.com',
+                'password' => bcrypt('2580'), // Change this in production
+            ]);
+        }
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Seed Blog Module
+        $this->call([
+            BlogCategorySeeder::class,
+            BlogTagSeeder::class,
+            BlogSeeder::class,
+            IconSeeder::class,
+            ToolCategorySeeder::class,
+            ToolTagSeeder::class,
+            ToolSeeder::class,
+            LegalPagesSeeder::class,
+            FaqSeeder::class,
+            GameGenresSeeder::class,
+            BuiltInToolsSeeder::class,
         ]);
+
+        $this->command->info('');
+        $this->command->info('✅ Database seeded successfully!');
+        $this->command->info('');
+        $this->command->info('📧 Admin Email: super@gmail.com');
+        $this->command->info('🔑 Admin Password: 2580');
+        $this->command->info('');
     }
 }

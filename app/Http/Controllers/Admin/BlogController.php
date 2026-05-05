@@ -47,8 +47,10 @@ class BlogController extends Controller
      */
     public function create()
     {
-        $categories = BlogCategory::orderBy('order')->get();
-        return view('admin.blogs.create', compact('categories'));
+        $categories = BlogCategory::orderBy('name')->get();
+        $tags = \App\Models\BlogTag::orderBy('name')->get();
+        $icons = \App\Models\Icon::orderBy('category')->orderBy('name')->get();
+        return view('admin.blogs.create', compact('categories', 'tags', 'icons'));
     }
 
     /**
@@ -60,7 +62,6 @@ class BlogController extends Controller
             'title' => 'required|string|max:255',
             'slug' => 'nullable|string|unique:blogs,slug',
             'category_id' => 'nullable|exists:blog_categories,id',
-            'category_color' => 'required|in:g,c,b,a',
             'author_name' => 'required|string|max:100',
             'content' => 'required|string',
             'published_date' => 'required|date',
@@ -77,6 +78,10 @@ class BlogController extends Controller
         if ($request->hasFile('featured_image')) {
             $path = $request->file('featured_image')->store('blogs', 'public');
             $validated['featured_image'] = $path;
+            $validated['featured_icon'] = null;
+        } elseif ($request->filled('featured_icon')) {
+            $validated['featured_icon'] = $request->input('featured_icon');
+            $validated['featured_image'] = null;
         }
 
         if ($request->hasFile('author_avatar')) {
@@ -306,6 +311,16 @@ class BlogController extends Controller
         // Create blog
         $blog = Blog::create($validated);
 
+        // Return JSON for AJAX requests
+        if ($request->wantsJson() || $request->ajax()) {
+            session()->flash('success', 'Blog created successfully!');
+            return response()->json([
+                'success' => true,
+                'message' => 'Blog created successfully!',
+                'redirect' => route('admin.blogs.index')
+            ]);
+        }
+
         return redirect()->route('admin.blogs.index')
             ->with('success', 'Blog created successfully!');
     }
@@ -324,8 +339,10 @@ class BlogController extends Controller
      */
     public function edit(Blog $blog)
     {
-        $categories = BlogCategory::orderBy('order')->get();
-        return view('admin.blogs.edit', compact('blog', 'categories'));
+        $categories = BlogCategory::orderBy('name')->get();
+        $tags = \App\Models\BlogTag::orderBy('name')->get();
+        $icons = \App\Models\Icon::orderBy('category')->orderBy('name')->get();
+        return view('admin.blogs.edit', compact('blog', 'categories', 'tags', 'icons'));
     }
 
     /**
@@ -337,7 +354,6 @@ class BlogController extends Controller
             'title' => 'required|string|max:255',
             'slug' => 'nullable|string|unique:blogs,slug,' . $blog->id,
             'category_id' => 'nullable|exists:blog_categories,id',
-            'category_color' => 'required|in:g,c,b,a',
             'author_name' => 'required|string|max:100',
             'content' => 'required|string',
             'published_date' => 'required|date',
@@ -354,6 +370,10 @@ class BlogController extends Controller
         if ($request->hasFile('featured_image')) {
             $path = $request->file('featured_image')->store('blogs', 'public');
             $validated['featured_image'] = $path;
+            $validated['featured_icon'] = null;
+        } elseif ($request->filled('featured_icon')) {
+            $validated['featured_icon'] = $request->input('featured_icon');
+            $validated['featured_image'] = null;
         }
 
         if ($request->hasFile('author_avatar')) {
@@ -583,6 +603,16 @@ class BlogController extends Controller
         // Update blog
         $blog->update($validated);
 
+        // Return JSON for AJAX requests
+        if ($request->wantsJson() || $request->ajax()) {
+            session()->flash('success', 'Blog updated successfully!');
+            return response()->json([
+                'success' => true,
+                'message' => 'Blog updated successfully!',
+                'redirect' => route('admin.blogs.index')
+            ]);
+        }
+
         return redirect()->route('admin.blogs.index')
             ->with('success', 'Blog updated successfully!');
     }
@@ -593,6 +623,13 @@ class BlogController extends Controller
     public function destroy(Blog $blog)
     {
         $blog->delete();
+
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Blog deleted successfully!'
+            ]);
+        }
 
         return redirect()->route('admin.blogs.index')
             ->with('success', 'Blog deleted successfully!');

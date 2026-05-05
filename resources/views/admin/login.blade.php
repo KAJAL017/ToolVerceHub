@@ -6,11 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Admin Login - ToolHub</title>
     
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Custom Tailwind Config -->
-    <script>
+        <script>
         tailwind.config = {
             theme: {
                 extend: {
@@ -33,8 +31,7 @@
         }
     </script>
     
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -90,28 +87,23 @@
 </head>
 <body class="gradient-bg min-h-screen flex items-center justify-center p-4">
     
-    <!-- Background Decorative Elements -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
         <div class="absolute top-20 left-10 w-72 h-72 bg-primary-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 floating-animation"></div>
         <div class="absolute top-40 right-10 w-72 h-72 bg-primary-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 floating-animation" style="animation-delay: 1s;"></div>
         <div class="absolute -bottom-20 left-1/2 w-72 h-72 bg-primary-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 floating-animation" style="animation-delay: 2s;"></div>
     </div>
 
-    <!-- Login Container -->
-    <div class="relative z-10 w-full max-w-6xl mx-auto fade-in">
+        <div class="relative z-10 w-full max-w-6xl mx-auto fade-in">
         <div class="grid md:grid-cols-2 gap-0 rounded-2xl overflow-hidden shadow-2xl">
             
-            <!-- Left Side - Branding & Info -->
-            <div class="bg-gradient-to-br from-primary-800 to-primary-900 p-12 flex flex-col justify-between text-white relative overflow-hidden">
+                        <div class="bg-gradient-to-br from-primary-800 to-primary-900 p-12 flex flex-col justify-between text-white relative overflow-hidden">
                 
-                <!-- Decorative Pattern -->
-                <div class="absolute inset-0 opacity-10">
+                                <div class="absolute inset-0 opacity-10">
                     <div class="absolute top-0 left-0 w-full h-full" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
                 </div>
                 
                 <div class="relative z-10">
-                    <!-- Logo -->
-                    <div class="flex items-center space-x-3 mb-8">
+                                        <div class="flex items-center space-x-3 mb-8">
                         <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
                             <i class="fas fa-tools text-primary-600 text-2xl"></i>
                         </div>
@@ -121,15 +113,13 @@
                         </div>
                     </div>
                     
-                    <!-- Welcome Message -->
-                    <div class="space-y-4">
+                                        <div class="space-y-4">
                         <h2 class="text-4xl font-bold leading-tight">Welcome Back to Your Dashboard</h2>
                         <p class="text-primary-100 text-lg">Manage your enterprise tools and resources efficiently with our comprehensive admin platform.</p>
                     </div>
                 </div>
                 
-                <!-- Features List -->
-                <div class="relative z-10 space-y-4">
+                                <div class="relative z-10 space-y-4">
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 bg-primary-700 rounded-lg flex items-center justify-center">
                             <i class="fas fa-shield-alt text-primary-200"></i>
@@ -160,25 +150,17 @@
                         </div>
                     </div>
                 </div>
-                
-                <!-- Footer -->
-                <div class="relative z-10 pt-8 border-t border-primary-700">
-                    <p class="text-primary-200 text-sm">&copy; 2026 ToolHub. All rights reserved.</p>
-                </div>
             </div>
             
-            <!-- Right Side - Login Form -->
-            <div class="glass-effect p-12 flex items-center">
+                        <div class="glass-effect p-12 flex items-center">
                 <div class="w-full">
                     
-                    <!-- Header -->
-                    <div class="text-center mb-8">
+                                        <div class="text-center mb-8">
                         <h2 class="text-3xl font-bold text-gray-800 mb-2">Admin Login</h2>
                         <p class="text-gray-600">Enter your credentials to access the dashboard</p>
                     </div>
                     
-                    <!-- Success Messages -->
-                    @if (session('success'))
+                                        @if (session('success'))
                         <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded">
                             <div class="flex items-center">
                                 <i class="fas fa-check-circle text-green-500 mr-2"></i>
@@ -187,8 +169,7 @@
                         </div>
                     @endif
                     
-                    <!-- Error Messages -->
-                    @if ($errors->any())
+                                        @if ($errors->any())
                         <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
                             <div class="flex items-center">
                                 <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
@@ -201,12 +182,10 @@
                         </div>
                     @endif
                     
-                    <!-- Login Form -->
-                    <form action="{{ route('admin.login.post') }}" method="POST" class="space-y-6">
+                                        <form action="{{ route('admin.login.post') }}" method="POST" class="space-y-6">
                         @csrf
                         
-                        <!-- Email Input -->
-                        <div>
+                                                <div>
                             <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
                                 <i class="fas fa-envelope text-primary-600 mr-2"></i>Email Address
                             </label>
@@ -221,8 +200,7 @@
                             >
                         </div>
                         
-                        <!-- Password Input -->
-                        <div>
+                                                <div>
                             <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
                                 <i class="fas fa-lock text-primary-600 mr-2"></i>Password
                             </label>
@@ -245,8 +223,7 @@
                             </div>
                         </div>
                         
-                        <!-- Submit Button -->
-                        <button 
+                                                <button 
                             type="submit" 
                             class="w-full btn-primary text-white font-semibold py-3 px-6 rounded-lg focus:outline-none focus:ring-4 focus:ring-primary-300"
                         >
@@ -260,8 +237,7 @@
         </div>
     </div>
     
-    <!-- JavaScript for Password Toggle -->
-    <script>
+        <script>
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const toggleIcon = document.getElementById('toggleIcon');
@@ -280,3 +256,6 @@
     
 </body>
 </html>
+
+
+

@@ -24,6 +24,7 @@ class Blog extends Model
         'seo_keywords',
         'canonical_url',
         'featured_image',
+        'featured_icon',
         'featured_image_emoji',
         
         // Author Information

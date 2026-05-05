@@ -10,28 +10,20 @@ class BlogCategory extends Model
     protected $fillable = [
         'name',
         'slug',
-        'color',
-        'icon_emoji',
         'description',
+        'icon_emoji',
+        'color',
         'order',
+        'is_featured',
+    ];
+
+    protected $casts = [
+        'is_featured' => 'boolean',
     ];
 
     // Relationship with Blog
     public function blogs(): HasMany
     {
         return $this->hasMany(Blog::class, 'category_id');
-    }
-
-    // Get color class for frontend
-    public function getColorClassAttribute()
-    {
-        $colors = [
-            'g' => 'green',
-            'c' => 'coral',
-            'b' => 'blue',
-            'a' => 'amber',
-        ];
-        
-        return $colors[$this->color] ?? 'green';
     }
 }

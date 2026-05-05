@@ -168,12 +168,12 @@ a{color:inherit;text-decoration:none}button{font-family:var(--f2);cursor:pointer
 .stoc-a:hover{background:var(--bg2);color:var(--g);border-left-color:var(--g)}
 .stoc-a.active{color:var(--g);border-left-color:var(--g);background:var(--gl);font-weight:700}
 .stoc-dot{width:5px;height:5px;border-radius:50%;background:var(--bdr2);flex-shrink:0}
-.sp-promo{border:1.5px solid var(--bdr);border-radius:var(--r16);padding:13px;margin-bottom:9px;transition:border-color .18s}
+.sp-promo{border:1.5px solid var(--bdr);border-radius:var(--r16);padding:13px;margin-bottom:9px;transition:border-color .18s;display:block;text-decoration:none}
 .sp-promo:last-child{margin-bottom:0}
 .sp-promo:hover{border-color:var(--gb)}.sp-promo.c:hover{border-color:var(--cb)}.sp-promo.b:hover{border-color:var(--bb)}
 .sp-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .sp-ic{font-size:1.1rem}.sp-nm{font-weight:700;font-size:.83rem;color:var(--ink)}
-.sp-ds{font-size:.75rem;color:var(--mist);line-height:1.55;margin-bottom:8px}
+.sp-ds{font-size:.75rem;color:var(--mid);line-height:1.55;margin-bottom:8px}
 .sp-lk{font-size:.76rem;font-weight:700;display:inline-flex;align-items:center;gap:3px;transition:gap .14s}
 .sp-lk.g{color:var(--g)}.sp-lk.c{color:var(--c)}.sp-lk.b{color:var(--b)}.sp-lk:hover{gap:6px}
 .qls{display:flex;flex-direction:column;gap:7px}
@@ -432,11 +432,11 @@ a{color:inherit;text-decoration:none}button{font-family:var(--f2);cursor:pointer
         @foreach($blog->sidebar_promos as $promo)
           <a href="{{ $promo['link_url'] ?? '#' }}" class="sp-promo {{ $promo['color'] ?? '' }}" target="_blank" rel="noopener">
             <div class="sp-top">
-              <div class="sp-ic">{{ $promo['emoji'] ?? '🔧' }}</div>
+              <span class="sp-ic">{{ $promo['emoji'] ?? '🔧' }}</span>
               <div class="sp-nm">{{ $promo['name'] ?? '' }}</div>
             </div>
             <div class="sp-ds">{{ $promo['description'] ?? '' }}</div>
-            <div class="sp-lk {{ $promo['color'] ?? 'g' }}">{{ $promo['link_text'] ?? 'Learn More' }} →</div>
+            <span class="sp-lk g">{{ $promo['link_text'] ?? 'Try Free' }} →</span>
           </a>
         @endforeach
       </div>
@@ -462,6 +462,143 @@ a{color:inherit;text-decoration:none}button{font-family:var(--f2);cursor:pointer
 </div>
 
 <!-- Include Scripts -->
-@include('website.partials.scripts')
+@section('extra_scripts')
+<script>
+(function() {
+    'use strict';
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-add IDs to headings based on TOC (FIRST - before any click handlers)
+        const tocItems = @json($blog->table_of_contents ?? []);
+        const articleContent = document.querySelector('.art');
+        
+        if (articleContent && tocItems.length > 0) {
+            const allHeadings = articleContent.querySelectorAll('h2, h3, h4');
+            
+            tocItems.forEach((tocItem, tocIndex) => {
+                const tocTitle = tocItem.title.trim().toLowerCase();
+                const tocId = tocItem.id;
+                
+                // Find matching heading
+                for (let i = 0; i < allHeadings.length; i++) {
+                    const heading = allHeadings[i];
+                    
+                    // Skip if already has an ID
+                    if (heading.id) continue;
+                    
+                    const headingText = heading.textContent.trim().toLowerCase();
+                    
+                    // Match by exact text or partial match
+                    if (headingText === tocTitle || 
+                        headingText.includes(tocTitle) || 
+                        tocTitle.includes(headingText)) {
+                        heading.id = tocId;
+                        console.log('Added ID:', tocId, 'to heading:', heading.textContent);
+                        break;
+                    }
+                }
+            });
+        }
+        
+        // Smooth scroll for TOC links
+        const tocLinks = document.querySelectorAll('.toc-a, .stoc-a');
+        
+        tocLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                console.log('Clicked TOC link:', targetId);
+                console.log('Target element found:', targetElement);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    // Update URL without scrolling
+                    history.pushState(null, null, '#' + targetId);
+                    
+                    // Highlight the clicked link
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                } else {
+                    console.error('Target element not found for ID:', targetId);
+                }
+            });
+        });
+        
+        // Highlight active TOC link on scroll
+        let isScrolling = false;
+        window.addEventListener('scroll', function() {
+            if (!isScrolling) {
+                window.requestAnimationFrame(function() {
+                    updateActiveTocLink();
+                    isScrolling = false;
+                });
+                isScrolling = true;
+            }
+        });
+        
+        function updateActiveTocLink() {
+            const headings = document.querySelectorAll('.art h2[id], .art h3[id], .art h4[id]');
+            let currentHeading = null;
+            
+            headings.forEach(heading => {
+                const rect = heading.getBoundingClientRect();
+                if (rect.top <= 150 && rect.top >= -100) {
+                    currentHeading = heading;
+                }
+            });
+            
+            if (currentHeading) {
+                tocLinks.forEach(link => {
+                    const href = link.getAttribute('href').substring(1);
+                    if (href === currentHeading.id) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            }
+        }
+        
+        // Handle direct URL hash on page load
+        if (window.location.hash) {
+            setTimeout(() => {
+                const targetId = window.location.hash.substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }, 300);
+        }
+    });
+})();
+</script>
+
+<style>
+.toc-a.active,
+.stoc-a.active {
+    color: #22c55e;
+    font-weight: 600;
+}
+
+.art h2[id],
+.art h3[id],
+.art h4[id] {
+    scroll-margin-top: 100px;
+}
+</style>
+@endsection
+
+@section('schema')
+@include('website.partials.blog-schema')
+@endsection
 
 @endsection

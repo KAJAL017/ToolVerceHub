@@ -14,7 +14,10 @@ class BlogCategoryController extends Controller
      */
     public function index()
     {
-        $categories = BlogCategory::withCount('blogs')->orderBy('order')->get();
+        $categories = BlogCategory::withCount(['blogs' => function($query) {
+            $query->where('status', 'published');
+        }])->orderBy('name')->paginate(15);
+        
         return view('admin.blog-categories.index', compact('categories'));
     }
 
@@ -23,7 +26,8 @@ class BlogCategoryController extends Controller
      */
     public function create()
     {
-        return view('admin.blog-categories.create');
+        $icons = \App\Models\Icon::orderBy('category')->orderBy('name')->get();
+        return view('admin.blog-categories.create', compact('icons'));
     }
 
     /**
@@ -34,10 +38,9 @@ class BlogCategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|unique:blog_categories,slug',
-            'color' => 'required|in:g,c,b,a',
-            'icon_emoji' => 'nullable|string|max:10',
             'description' => 'nullable|string',
-            'order' => 'nullable|integer',
+            'icon_emoji' => 'nullable|string|max:10',
+            'is_featured' => 'nullable|boolean',
         ]);
 
         // Auto-generate slug if not provided
@@ -45,12 +48,18 @@ class BlogCategoryController extends Controller
             $validated['slug'] = Str::slug($validated['name']);
         }
 
-        // Set default order
-        if (empty($validated['order'])) {
-            $validated['order'] = BlogCategory::max('order') + 1;
-        }
+        // Handle checkbox (if not checked, it won't be in request)
+        $validated['is_featured'] = $request->has('is_featured') ? true : false;
 
         BlogCategory::create($validated);
+
+        // Return JSON response for AJAX
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Category created successfully!'
+            ]);
+        }
 
         return redirect()->route('admin.blog-categories.index')
             ->with('success', 'Category created successfully!');
@@ -61,7 +70,8 @@ class BlogCategoryController extends Controller
      */
     public function edit(BlogCategory $blogCategory)
     {
-        return view('admin.blog-categories.edit', compact('blogCategory'));
+        $icons = \App\Models\Icon::orderBy('category')->orderBy('name')->get();
+        return view('admin.blog-categories.edit', compact('blogCategory', 'icons'));
     }
 
     /**
@@ -72,10 +82,9 @@ class BlogCategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|unique:blog_categories,slug,' . $blogCategory->id,
-            'color' => 'required|in:g,c,b,a',
-            'icon_emoji' => 'nullable|string|max:10',
             'description' => 'nullable|string',
-            'order' => 'nullable|integer',
+            'icon_emoji' => 'nullable|string|max:10',
+            'is_featured' => 'nullable|boolean',
         ]);
 
         // Auto-generate slug if not provided
@@ -83,10 +92,38 @@ class BlogCategoryController extends Controller
             $validated['slug'] = Str::slug($validated['name']);
         }
 
+        // Handle checkbox (if not checked, it won't be in request)
+        $validated['is_featured'] = $request->has('is_featured') ? true : false;
+
         $blogCategory->update($validated);
+
+        // Return JSON response for AJAX
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Category updated successfully!'
+            ]);
+        }
 
         return redirect()->route('admin.blog-categories.index')
             ->with('success', 'Category updated successfully!');
+    }
+
+    /**
+     * Toggle featured status of the category.
+     */
+    public function toggleFeatured(Request $request, BlogCategory $blogCategory)
+    {
+        $blogCategory->is_featured = !$blogCategory->is_featured;
+        $blogCategory->save();
+
+        return response()->json([
+            'success' => true,
+            'is_featured' => $blogCategory->is_featured,
+            'message' => $blogCategory->is_featured 
+                ? 'Category marked as featured!' 
+                : 'Category removed from featured!'
+        ]);
     }
 
     /**
@@ -94,13 +131,26 @@ class BlogCategoryController extends Controller
      */
     public function destroy(BlogCategory $blogCategory)
     {
-        // Check if category has blogs
         if ($blogCategory->blogs()->count() > 0) {
+            if (request()->wantsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot delete category with existing blogs!'
+                ], 400);
+            }
+            
             return redirect()->route('admin.blog-categories.index')
                 ->with('error', 'Cannot delete category with existing blogs!');
         }
 
         $blogCategory->delete();
+
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Category deleted successfully!'
+            ]);
+        }
 
         return redirect()->route('admin.blog-categories.index')
             ->with('success', 'Category deleted successfully!');
